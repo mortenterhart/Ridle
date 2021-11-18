@@ -34,14 +34,6 @@ class SubToClassMapper:
         return self._class_dict[self._subject_dict[subject]]
 
 
-def label_to_idx(labels):
-    pass
-
-
-def one_hot_idx():
-    pass
-
-
 def get_classes_to_idx_dict(mapper, embeddings):
     """
     Compute a dict to look up the numeric value for a class from the dataset.
