@@ -3,11 +3,11 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer
 
-from keras.models import Sequential
-from keras.layers import Dense, Activation
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
-from keras import backend as K
+from tensorflow.keras import backend as K
 import argparse
 import os
 
