@@ -100,7 +100,7 @@ result['method'] = 'Ridle'
 df_result = pd.DataFrame([result])
 print(df_result)
 
-if os.path.isfile('./evaluation_instance_type.csv'):
-    df_result.to_csv('./evaluation_instance_type.csv', mode='a', header=False, index=False)
+if os.path.isfile('f1_scores/evaluation_nn.csv'):
+    df_result.to_csv('./f1_scores/evaluation_nn.csv', mode='a', header=False, index=False)
 else:
-    df_result.to_csv('./evaluation_instance_type.csv', index=False)
+    df_result.to_csv('./f1_scores/evaluation_nn.csv', index=False)
