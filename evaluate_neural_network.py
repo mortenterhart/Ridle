@@ -6,13 +6,15 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation
 from sklearn.metrics import f1_score
-from sklearn.model_selection import train_test_split
 from tensorflow.keras import backend as K
 import argparse
 import os
 
+from type_preprocessing import aggregate_type_mappings
+
+
 parser = argparse.ArgumentParser(
-    description='Instance Type Prediction using Ridle',
+    description='Neural Network Prediction using Ridle',
 )
 parser.add_argument('--dataset', nargs='?', default='DBp_2016-04', type=str)
 parser = parser.parse_args()
@@ -23,17 +25,27 @@ def gelu(x):
     return 0.5 * x * (1 + K.tanh(x * 0.7978845608 * (1 + 0.044715 * x * x)))
 
 
+dataset = parser.dataset
+print(f'Training on dataset {dataset}')
+
 # Load Representations
 print('Reading Data...')
-df = pd.read_csv('./dataset/{}/embedding.csv'.format(parser.dataset))
+df = pd.read_csv('./dataset/{}/embedding.csv'.format(dataset))
 
 # Load mapping
-if 'dbp' in parser.dataset.lower():
+if 'dbp' in dataset.lower():
     mapping = pd.read_json('./dataset/dbp_type_mapping.json')
-elif 'wd' in parser.dataset.lower() or 'wikidata' in parser.dataset.lower():
+elif 'wd' in dataset.lower() or 'wikidata' in dataset.lower():
     mapping = pd.read_json('./dataset/wd_mapping_type.json')
+elif 'fb' in dataset.lower():
+    fb_types = pd.read_csv('./dataset/FB15K237/freebase_types.tsv', sep='\t', names=['S', 'Class'])
+    mapping = aggregate_type_mappings(fb_types)
+elif 'yago' in dataset.lower():
+    yago_types = pd.read_csv('./dataset/YAGO3-10/yago_types.tsv', sep='\t', names=['S', 'P', 'Class'])
+    yago_types = yago_types[['S', 'Class']].replace(['^<', '>$'], ['', ''], regex=True)
+    mapping = aggregate_type_mappings(yago_types)
 else:
-    mapping = pd.read_json('./dataset/{}/type_mapping.json'.format(parser.dataset))
+    mapping = pd.read_json('./dataset/{}/type_mapping.json'.format(dataset))
 
 # merge them
 print('Processing Data...')
@@ -46,6 +58,7 @@ loss_per_fold, f1_macro, f1_micro, f1_weighted = [], [], [], []
 kfold = KFold(n_splits=K_FOLD, shuffle=True, random_state=42)
 targets = mlb.fit_transform(r['Class'])
 inputs = r.drop(['S', 'Class'], axis=1).values
+
 for train, test in kfold.split(inputs, targets):
     model = Sequential()
     model.add(Dense(inputs[train].shape[1], input_dim=inputs[train].shape[1]))
@@ -95,7 +108,7 @@ result['F1-Micro'] = np.mean(f1_micro)
 result['F1-Micro_std'] = np.std(f1_micro)
 result['F1-Weighted'] = np.mean(f1_weighted)
 result['F1-Weighted_std'] = np.std(f1_weighted)
-result['Dataset'] = parser.dataset
+result['Dataset'] = dataset
 result['method'] = 'Ridle'
 df_result = pd.DataFrame([result])
 print(df_result)
