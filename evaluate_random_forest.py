@@ -18,79 +18,85 @@ parser.add_argument('--dataset', nargs='?', default='DBp_2016-04', type=str)
 parser = parser.parse_args()
 
 dataset = parser.dataset
-print(f'Training on dataset {dataset}')
 
-# Load Representations
-print('Reading Data...')
-df = pd.read_csv('./dataset/{}/embedding.csv'.format(dataset))
+dataset_names = ['FB-L1', 'FB-L2-org', 'FB-L2-person', 'FB-L3-person-writer', 'YAGO-L1', 'YAGO-L2-org',
+                 'YAGO-L2-body_of_water', 'YAGO-L2-person', 'YAGO-L3-person-writer', 'YAGO-L3-person-artist',
+                 'YAGO-L3-person-player', 'YAGO-L3-person-scientist']
 
-# Load mapping
-if 'dbp' in dataset.lower():
-    mapping = pd.read_json('./dataset/dbp_type_mapping.json')
-elif 'wd' in dataset.lower() or 'wikidata' in dataset.lower():
-    mapping = pd.read_json('./dataset/wd_mapping_type.json')
-elif 'fb' in dataset.lower():
-    fb_types = pd.read_csv('./dataset/FB15K237/freebase_types.tsv', sep='\t', names=['S', 'Class'])
-    mapping = aggregate_type_mappings(fb_types)
-elif 'yago' in dataset.lower():
-    yago_types = pd.read_csv('./dataset/YAGO3-10/yago_types.tsv', sep='\t', names=['S', 'P', 'Class'])
-    yago_types = yago_types[['S', 'Class']].replace(['^<', '>$'], ['', ''], regex=True)
-    mapping = aggregate_type_mappings(yago_types)
-else:
-    mapping = pd.read_json('./dataset/{}/type_mapping.json'.format(dataset))
+for dataset in dataset_names:
+    print(f'Training on dataset {dataset}')
 
-# merge them
-print('Processing Data...')
-r = pd.merge(df, mapping, on='S')
+    # Load Representations
+    print('Reading Data...')
+    df = pd.read_csv('./dataset/{}/embedding.csv'.format(dataset))
 
-K_FOLD = 10
-mlb = MultiLabelBinarizer()
-fold_no = 1
-f1_macro, f1_micro, f1_weighted = [], [], []
-kfold = KFold(n_splits=K_FOLD, shuffle=True, random_state=42)
-targets = mlb.fit_transform(r['Class'])
-inputs = r.drop(['S', 'Class'], axis=1).values
+    # Load mapping
+    if 'dbp' in dataset.lower():
+        mapping = pd.read_json('./dataset/dbp_type_mapping.json')
+    elif 'wd' in dataset.lower() or 'wikidata' in dataset.lower():
+        mapping = pd.read_json('./dataset/wd_mapping_type.json')
+    elif 'fb' in dataset.lower():
+        fb_types = pd.read_csv('./dataset/FB15K237/freebase_types.tsv', sep='\t', names=['S', 'Class'])
+        mapping = aggregate_type_mappings(fb_types)
+    elif 'yago' in dataset.lower():
+        yago_types = pd.read_csv('./dataset/YAGO3-10/yago_types.tsv', sep='\t', names=['S', 'P', 'Class'])
+        yago_types = yago_types[['S', 'Class']].replace(['^<', '>$'], ['', ''], regex=True)
+        mapping = aggregate_type_mappings(yago_types)
+    else:
+        mapping = pd.read_json('./dataset/{}/type_mapping.json'.format(dataset))
 
-for train, test in kfold.split(inputs, targets):
-    model = RandomForestClassifier(verbose=1, n_jobs=-1)
-    model.fit(inputs[train], targets[train])
+    # merge them
+    print('Processing Data...')
+    r = pd.merge(df, mapping, on='S')
 
-    y_pred = model.predict(inputs[test])
-    accuracy = accuracy_score(targets[test], y_pred)
+    K_FOLD = 10
+    mlb = MultiLabelBinarizer()
+    fold_no = 1
+    f1_macro, f1_micro, f1_weighted = [], [], []
+    kfold = KFold(n_splits=K_FOLD, shuffle=True, random_state=42)
+    targets = mlb.fit_transform(r['Class'])
+    inputs = r.drop(['S', 'Class'], axis=1).values
 
-    f1_macro.append(f1_score(targets[test], y_pred, average='macro', zero_division=1))
-    f1_micro.append(f1_score(targets[test], y_pred, average='micro', zero_division=1))
-    f1_weighted.append(f1_score(targets[test], y_pred, average='weighted', zero_division=1))
+    for train, test in kfold.split(inputs, targets):
+        model = RandomForestClassifier(verbose=1, n_jobs=-1)
+        model.fit(inputs[train], targets[train])
 
-    print('Score for fold', fold_no, ':', 'F1-Macro:', f1_macro[-1],
-          'F1-Micro:', f1_micro[-1])
+        y_pred = model.predict(inputs[test])
+        accuracy = accuracy_score(targets[test], y_pred)
 
-    fold_no += 1
+        f1_macro.append(f1_score(targets[test], y_pred, average='macro', zero_division=1))
+        f1_micro.append(f1_score(targets[test], y_pred, average='micro', zero_division=1))
+        f1_weighted.append(f1_score(targets[test], y_pred, average='weighted', zero_division=1))
 
-# Provide average scores
-print('------------------------------------------------------------------------')
-print('Average scores for all folds:')
-print('> F1-Macro:', np.mean(f1_macro), '(+-', np.std(f1_macro), ')')
-print('> F1-Micro:', np.mean(f1_micro), '(+-', np.std(f1_micro), ')')
-print('------------------------------------------------------------------------')
+        print('Score for fold', fold_no, ':', 'F1-Macro:', f1_macro[-1],
+              'F1-Micro:', f1_micro[-1])
 
-# Save results to file
-result = {}
-f1_macro = np.array(f1_macro)
-f1_micro = np.array(f1_micro)
-f1_weighted = np.array(f1_weighted)
-result['F1-Macro'] = np.mean(f1_macro)
-result['F1-Macro_std'] = np.std(f1_macro)
-result['F1-Micro'] = np.mean(f1_micro)
-result['F1-Micro_std'] = np.std(f1_micro)
-result['F1-Weighted'] = np.mean(f1_weighted)
-result['F1-Weighted_std'] = np.std(f1_weighted)
-result['Dataset'] = dataset
-result['method'] = 'Ridle'
-df_result = pd.DataFrame([result])
-print(df_result)
+        fold_no += 1
 
-if os.path.isfile('f1_scores/evaluation_rf.csv'):
-    df_result.to_csv('./f1_scores/evaluation_rf.csv', mode='a', header=False, index=False)
-else:
-    df_result.to_csv('./f1_scores/evaluation_rf.csv', index=False)
+    # Provide average scores
+    print('------------------------------------------------------------------------')
+    print('Average scores for all folds:')
+    print('> F1-Macro:', np.mean(f1_macro), '(+-', np.std(f1_macro), ')')
+    print('> F1-Micro:', np.mean(f1_micro), '(+-', np.std(f1_micro), ')')
+    print('------------------------------------------------------------------------')
+
+    # Save results to file
+    result = {}
+    f1_macro = np.array(f1_macro)
+    f1_micro = np.array(f1_micro)
+    f1_weighted = np.array(f1_weighted)
+    result['F1-Macro'] = np.mean(f1_macro)
+    result['F1-Macro_std'] = np.std(f1_macro)
+    result['F1-Micro'] = np.mean(f1_micro)
+    result['F1-Micro_std'] = np.std(f1_micro)
+    result['F1-Weighted'] = np.mean(f1_weighted)
+    result['F1-Weighted_std'] = np.std(f1_weighted)
+    result['Dataset'] = dataset
+    result['method'] = 'Ridle'
+    df_result = pd.DataFrame([result])
+    print(df_result)
+
+    if os.path.isfile('f1_scores/evaluation_rf.csv'):
+        df_result.to_csv('./f1_scores/evaluation_rf.csv', mode='a', header=False, index=False)
+    else:
+        df_result.to_csv('./f1_scores/evaluation_rf.csv', index=False)
