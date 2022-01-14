@@ -4,7 +4,7 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, f1_score
 
@@ -23,7 +23,7 @@ dataset_names = ['FB-L1', 'FB-L2-org', 'FB-L2-person', 'FB-L3-person-writer', 'Y
                  'YAGO-L2-body_of_water', 'YAGO-L2-person', 'YAGO-L3-person-writer', 'YAGO-L3-person-artist',
                  'YAGO-L3-person-player', 'YAGO-L3-person-scientist']
 
-for dataset in dataset_names:
+for dataset in ['umls']:
     print(f'Training on dataset {dataset}')
 
     # Load Representations
@@ -58,7 +58,7 @@ for dataset in dataset_names:
     inputs = r.drop(['S', 'Class'], axis=1).values
 
     for train, test in kfold.split(inputs, targets):
-        model = RandomForestClassifier(verbose=1, n_jobs=-1)
+        model = SVC(kernel='rbf', verbose=True)
         model.fit(inputs[train], targets[train])
 
         y_pred = model.predict(inputs[test])
@@ -96,7 +96,7 @@ for dataset in dataset_names:
     df_result = pd.DataFrame([result])
     print(df_result)
 
-    if os.path.isfile('f1_scores/evaluation_rf.csv'):
-        df_result.to_csv('./f1_scores/evaluation_rf.csv', mode='a', header=False, index=False)
+    if os.path.isfile('f1_scores/evaluation_svm.csv'):
+        df_result.to_csv('./f1_scores/evaluation_svm.csv', mode='a', header=False, index=False)
     else:
-        df_result.to_csv('./f1_scores/evaluation_rf.csv', index=False)
+        df_result.to_csv('./f1_scores/evaluation_svm.csv', index=False)
