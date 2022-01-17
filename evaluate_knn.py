@@ -9,7 +9,8 @@ from sklearn.model_selection import KFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import MultiLabelBinarizer
 
-from type_preprocessing import aggregate_type_mappings
+from type_preprocessing import aggregate_type_mappings, exclude_external_types
+from fb_yago_subsets import fb_yago_subsets
 
 
 class MultiLabelKNN:
@@ -72,10 +73,16 @@ for dataset in dataset_names:
     elif 'fb' in dataset.lower():
         fb_types = pd.read_csv('./dataset/FB15K237/freebase_types.tsv', sep='\t', names=['S', 'Class'])
         mapping = aggregate_type_mappings(fb_types)
+
+        if dataset in fb_yago_subsets:
+            mapping = exclude_external_types(mapping, fb_yago_subsets[dataset])
     elif 'yago' in dataset.lower():
         yago_types = pd.read_csv('./dataset/YAGO3-10/yago_types.tsv', sep='\t', names=['S', 'P', 'Class'])
         yago_types = yago_types[['S', 'Class']].replace(['^<', '>$'], ['', ''], regex=True)
         mapping = aggregate_type_mappings(yago_types)
+
+        if dataset in fb_yago_subsets:
+            mapping = exclude_external_types(mapping, fb_yago_subsets[dataset])
     else:
         mapping = pd.read_json('./dataset/{}/type_mapping.json'.format(dataset))
 
