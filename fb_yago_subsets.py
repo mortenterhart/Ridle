@@ -1,0 +1,20 @@
+fb_yago_subsets = {
+    'FB-L1': ['person', 'organization', 'body_of_water', 'product'],
+    'FB-L2-org': ['institution', 'musical_organization', 'party', 'enterprise',
+                  'nongovernmental_organization'],
+    'FB-L2-person': ['artist', 'politician', 'scientist', 'officeholder', 'writer'],
+    'FB-L3-person-writer': ['journalist', 'poet', 'novelist', 'scriptwriter', 'dramatist',
+                            'essayist', 'biographer'],
+    'YAGO-L1': ['person', 'organization', 'body_of_water', 'product'],
+    'YAGO-L2-org': ['institution', 'musical_organization', 'party', 'enterprise',
+                    'nongovernmental_organization'],
+    'YAGO-L2-body_of_water': ['stream', 'lake', 'ocean', 'bay', 'sea'],
+    'YAGO-L2-person': ['artist', 'politician', 'scientist', 'officeholder', 'writer'],
+    'YAGO-L3-person-writer': ['journalist', 'poet', 'novelist', 'scriptwriter', 'dramatist',
+                              'essayist', 'biographer'],
+    'YAGO-L3-person-artist': ['painter', 'sculptor', 'photographer', 'illustrator', 'printmaker'],
+    'YAGO-L3-person-player': ['hockey_player', 'soccer_player', 'ballplayer', 'volleyball_player',
+                              'golfer'],
+    'YAGO-L3-person-scientist': ['social_scientist', 'biologist', 'physicist', 'mathematician', 'chemist', 'linguist',
+                                 'psychologist', 'geologist', 'computer_scientist', 'research_worker']
+}
