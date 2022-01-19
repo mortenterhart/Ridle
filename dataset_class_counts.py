@@ -20,8 +20,6 @@ def dataset_class_counts(types_df):
     pandas.Series
         A series with the number of instances of each class.
     """
-    # Create one row for each class of entities
-    types_df = types_df.explode('Class')
     return types_df.groupby('Class').size().sort_values()
 
 
@@ -60,9 +58,15 @@ def main():
         r = pd.merge(df, mapping, on='S')
         r = r[['S', 'Class']]
 
+        # print(f'Classes for dataset {dataset}\n{r}')
+
+        # Create one row for each class of entities
+        r = r.explode('Class')
+
         # count the classes
-        print(f'Class counts for dataset {dataset}')
-        print(dataset_class_counts(r))
+        print(f'Class counts for dataset {dataset} with count < 40')
+        class_counts = dataset_class_counts(r)
+        print(class_counts[class_counts < 40])
 
 
 if __name__ == '__main__':

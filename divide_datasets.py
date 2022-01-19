@@ -30,6 +30,7 @@ def main():
 
         dataset = fb_labelled if 'fb' in dataset_name.lower() else yago_labelled
         subset = extract_dataset(dataset, include_types)
+        print(f"class counts for {dataset_name}\n{dataset_class_counts(subset[['S', 'Class']].drop_duplicates())}")
 
         if not os.path.exists(f'./dataset/{dataset_name}'):
             os.makedirs(f'./dataset/{dataset_name}')
