@@ -28,6 +28,5 @@ fb_yago_subsets = {
                                  'wordnet_physicist_110428004', 'wordnet_mathematician_110301261',
                                  'wordnet_chemist_109913824', 'wordnet_linguist_110264437',
                                  'wordnet_psychologist_110488865', 'wordnet_geologist_110127689',
-                                 'wordnet_computer_scientist_109951070', 'wordnet_research_worker_110523076'],
-
+                                 'wordnet_computer_scientist_109951070', 'wordnet_research_worker_110523076']
 }
