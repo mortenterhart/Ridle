@@ -28,7 +28,7 @@ def gelu(x):
 
 dataset = parser.dataset
 
-dataset_names = ['FB-L1', 'FB-L2-org', 'FB-L2-person', 'FB-L3-person-writer', 'YAGO-L1', 'YAGO-L2-org',
+dataset_names = ['FB-L1', 'FB-L2-org', 'FB-L2-person', 'FB-L3-person-artist', 'YAGO-L1', 'YAGO-L2-org',
                  'YAGO-L2-body_of_water', 'YAGO-L2-person', 'YAGO-L3-person-writer', 'YAGO-L3-person-artist',
                  'YAGO-L3-person-player', 'YAGO-L3-person-scientist']
 

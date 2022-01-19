@@ -1,6 +1,9 @@
 import pandas as pd
 
-pd.set_option('display.max_rows', 50)
+from type_preprocessing import aggregate_type_mappings, exclude_external_types
+from fb_yago_subsets import fb_yago_subsets
+
+pd.set_option('display.max_rows', None)
 
 
 def dataset_class_counts(types_df):
@@ -17,11 +20,13 @@ def dataset_class_counts(types_df):
     pandas.Series
         A series with the number of instances of each class.
     """
+    # Create one row for each class of entities
+    types_df = types_df.explode('Class')
     return types_df.groupby('Class').size().sort_values()
 
 
 def main():
-    dataset_names = ['FB-L1', 'FB-L2-org', 'FB-L2-person', 'FB-L3-person-writer', 'YAGO-L1', 'YAGO-L2-org',
+    dataset_names = ['FB-L1', 'FB-L2-org', 'FB-L2-person', 'FB-L3-person-artist', 'YAGO-L1', 'YAGO-L2-org',
                      'YAGO-L2-body_of_water', 'YAGO-L2-person', 'YAGO-L3-person-writer', 'YAGO-L3-person-artist',
                      'YAGO-L3-person-player', 'YAGO-L3-person-scientist']
 
@@ -37,16 +42,21 @@ def main():
             mapping = pd.read_json('./dataset/wd_mapping_type.json')
         elif 'fb' in dataset.lower():
             fb_types = pd.read_csv('./dataset/FB15K237/freebase_types.tsv', sep='\t', names=['S', 'Class'])
-            mapping = fb_types
+            mapping = aggregate_type_mappings(fb_types)
+
+            if dataset in fb_yago_subsets:
+                mapping = exclude_external_types(mapping, fb_yago_subsets[dataset])
         elif 'yago' in dataset.lower():
             yago_types = pd.read_csv('./dataset/YAGO3-10/yago_types.tsv', sep='\t', names=['S', 'P', 'Class'])
             yago_types = yago_types[['S', 'Class']].replace(['^<', '>$'], ['', ''], regex=True)
-            mapping = yago_types
+            mapping = aggregate_type_mappings(yago_types)
+
+            if dataset in fb_yago_subsets:
+                mapping = exclude_external_types(mapping, fb_yago_subsets[dataset])
         else:
             mapping = pd.read_json('./dataset/{}/type_mapping.json'.format(dataset))
 
         # merge them
-        print('Processing Data...')
         r = pd.merge(df, mapping, on='S')
         r = r[['S', 'Class']]
 

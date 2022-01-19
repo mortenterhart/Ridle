@@ -1,5 +1,4 @@
 import pandas as pd
-import re
 
 
 def aggregate_type_mappings(types_df):
@@ -24,19 +23,6 @@ def aggregate_type_mappings(types_df):
 
 
 def exclude_external_types(types_df, include_types):
-    include_regexes = [re.compile('wordnet_' + include_type + '_[0-9]+') for include_type in include_types]
-
-    def contained_elems(types):
-        res = []
-
-        for t in types:
-            for regex in include_regexes:
-                if regex.search(t):
-                    res.append(t)
-                    break
-
-        return res
-
-    types_df['Class'] = types_df['Class'].apply(lambda types: contained_elems(types))
+    types_df['Class'] = types_df['Class'].apply(lambda types: [t for t in types if t in include_types])
     return types_df
 
