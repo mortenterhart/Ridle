@@ -3,7 +3,7 @@ import pandas as pd
 from type_preprocessing import aggregate_type_mappings, exclude_external_types
 from fb_yago_subsets import fb_yago_subsets
 
-pd.set_option('display.max_rows', None)
+pd.set_option('display.max_rows', 100)
 
 
 def dataset_class_counts(types_df):
@@ -24,9 +24,8 @@ def dataset_class_counts(types_df):
 
 
 def main():
-    dataset_names = ['FB-L1', 'FB-L2-org', 'FB-L2-person', 'FB-L3-person-artist', 'YAGO-L1', 'YAGO-L2-org',
-                     'YAGO-L2-body_of_water', 'YAGO-L2-person', 'YAGO-L3-person-writer', 'YAGO-L3-person-artist',
-                     'YAGO-L3-person-player', 'YAGO-L3-person-scientist']
+    dataset_names = ['Songs_DBpedia', 'Person_DBpedia', 'Universities_DBpedia', 'ChemicalCompounds_DBpedia',
+                     'Books_DBpedia', 'umls', 'dblp', 'YAGO3-10']
 
     for dataset in dataset_names:
         # Load Representations
@@ -64,9 +63,9 @@ def main():
         r = r.explode('Class')
 
         # count the classes
-        print(f'Class counts for dataset {dataset} with count < 40')
+        print(f'Class counts for dataset {dataset}')
         class_counts = dataset_class_counts(r)
-        print(class_counts[class_counts < 40])
+        print(class_counts)
 
 
 if __name__ == '__main__':

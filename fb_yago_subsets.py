@@ -1,6 +1,5 @@
 fb_yago_subsets = {
-    'FB-L1': ['wordnet_person_100007846', 'wordnet_organization_108008335', 'wordnet_body_of_water_109225146',
-              'wordnet_product_104007894'],
+    'FB-L1': ['wordnet_person_100007846', 'wordnet_organization_108008335', 'wordnet_product_104007894'],
     'FB-L2-org': ['wordnet_musical_organization_108246613', 'wordnet_party_108256968', 'wordnet_enterprise_108056231',
                   'wordnet_nongovernmental_organization_108009834'],
     'FB-L2-person': ['wordnet_artist_109812338', 'wordnet_officeholder_110371450', 'wordnet_writer_110794014',
@@ -10,8 +9,8 @@ fb_yago_subsets = {
                 'wordnet_product_104007894'],
     'YAGO-L2-org': ['wordnet_musical_organization_108246613', 'wordnet_party_108256968', 'wordnet_enterprise_108056231',
                     'wordnet_nongovernmental_organization_108009834'],
-    'YAGO-L2-body_of_water': ['wordnet_stream_109448361', 'wordnet_lake_109328904',
-                              'wordnet_ocean_109376198', 'wordnet_bay_109215664', 'wordnet_sea_109426788'],
+    'YAGO-L2-body_of_water': ['wordnet_lake_109328904', 'wordnet_ocean_109376198', 'wordnet_bay_109215664',
+                              'wordnet_sea_109426788'],
     'YAGO-L2-person': ['wordnet_artist_109812338', 'wordnet_officeholder_110371450', 'wordnet_writer_110794014',
                        'wordnet_scientist_110560637', 'wordnet_politician_110450303'],
     'YAGO-L3-person-writer': ['wordnet_journalist_110224578', 'wordnet_poet_110444194', 'wordnet_novelist_110363573',
