@@ -1,9 +1,13 @@
+import os
+
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from fb_yago_subsets import fb_yago_subsets
 from dataset_predicate_counts import get_predicate_counts_for_dataset
 from sklearn.preprocessing import LabelEncoder
 import seaborn as sns
+import re
 
 
 def counts_to_list(pred_counts, label):
@@ -15,20 +19,17 @@ def counts_to_list(pred_counts, label):
 
 
 def main():
-    cached_data = False
-    labels = ['wordnet_social_scientist_110619642', 'wordnet_biologist_109855630',
-              'wordnet_physicist_110428004', 'wordnet_mathematician_110301261',
-              'wordnet_chemist_109913824', 'wordnet_linguist_110264437',
-              'wordnet_psychologist_110488865', 'wordnet_geologist_110127689',
-              'wordnet_computer_scientist_109951070', 'wordnet_research_worker_110523076']
+    dataset_name = 'YAGO-L3-person-scientist'
 
-    # predicate_counts = get_predicate_counts_for_dataset('YAGO-L3-person-scientist')
-    print('Computed predicate counts for all classes')
-    if cached_data:
-        predicate_counts = pd.read_csv('YAGO-L3-person-scientist_predicate_counts.csv')
+    labels = fb_yago_subsets[dataset_name]
+
+    if os.path.exists(f'{dataset_name}_predicate_counts.pkl'):
+        predicate_counts = pd.read_pickle(f'{dataset_name}_predicate_counts.pkl')
     else:
-        predicate_counts = get_predicate_counts_for_dataset('YAGO-L3-person-scientist')
-        predicate_counts.to_csv('YAGO-L3-person-scientist_predicate_counts.csv')
+        predicate_counts = get_predicate_counts_for_dataset(dataset_name)
+        predicate_counts.to_pickle(f'{dataset_name}_predicate_counts.pkl')
+
+    print('Computed predicate counts for all classes')
 
     predicates = list(set([j for i, j in predicate_counts.index.values]))
 
@@ -41,18 +42,21 @@ def main():
         predicate_class_list = counts_to_list(predicate_counts, label)
         predicate_class_list = encoder.transform(predicate_class_list)
         predicate_lists.append(predicate_class_list)
-        break
 
-    predicate_distributions = pd.DataFrame({'Class': [labels[0]], 'P': predicate_lists})
-    predicate_distributions = predicate_distributions.explode('P')
+    predicate_distributions = pd.DataFrame({'Class': labels, 'P': predicate_lists})
+    predicate_distributions = predicate_distributions.explode('P').reset_index(drop=True)
+    predicate_distributions['Class'].replace(['^wordnet_', '_[0-9]+'], '', regex=True, inplace=True)
 
     print('Created dataframe with predicate distributions')
     print('Dataframe shape:', predicate_distributions.shape)
 
-    sns.displot(data=predicate_distributions, x='P', bins=len(predicates), kind='kde', hue='Class', fill=True)
-    print('Created KDE plot')
+    g = sns.displot(data=predicate_distributions, x='P', kind='kde', hue='Class',
+                    fill=True, bw_adjust=0.3, aspect=1.5, legend=True)
+    # plt.legend(loc='upper left', labels=[re.sub("^wordnet_|_[0-9]+", "", i) for i in reversed(labels)], title='Class',
+    #            frameon=False)
+    g.set(xlabel="Predicate Id", ylabel="Predicate Frequency", title=f'Predicate Distributions for {dataset_name}')
+    plt.subplots_adjust(top=0.9)
     plt.show()
-    print('plt.show() finished')
 
 
 if __name__ == '__main__':
