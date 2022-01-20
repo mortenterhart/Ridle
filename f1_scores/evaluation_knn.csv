@@ -26,7 +26,7 @@ F1-Macro,F1-Macro_std,F1-Micro,F1-Micro_std,F1-Weighted,F1-Weighted_std,Dataset,
 ,,,,0.937,,YAGO-L1,TransE
 ,,,,0.733,,YAGO-L2-org,RDF2Vec
 ,,,,0.656,,YAGO-L2-org,TransE
-,,,,0.616,,YAGO-L2-body_of_water,RDF2Vec
+,,,,0.611,,YAGO-L2-body_of_water,RDF2Vec
 ,,,,0.643,,YAGO-L2-body_of_water,TransE
 ,,,,0.692,,YAGO-L2-person,RDF2Vec
 ,,,,0.706,,YAGO-L2-person,TransE
