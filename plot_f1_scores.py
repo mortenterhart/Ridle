@@ -42,3 +42,25 @@ sns_plot.set(title="F1-Macro vs. F1-Micro on different datasets")
 plt.subplots_adjust(bottom=0.1, top=0.9)
 fig = sns_plot.fig
 fig.show()
+
+
+nn_scores = pd.read_csv('f1_scores/evaluation_nn.csv')[11:]
+knn_scores = pd.read_csv('f1_scores/evaluation_knn.csv')[11:]
+rf_scores = pd.read_csv('f1_scores/evaluation_rf.csv')[11:]
+
+nn_scores['Classifier'] = 'Neural Network'
+knn_scores['Classifier'] = 'KNN'
+rf_scores['Classifier'] = 'Random Forest'
+
+df = pd.concat([nn_scores, knn_scores, rf_scores], axis=0, ignore_index=True)
+df['F1-Weighted'] = df['F1-Weighted'] * 100
+df['Embedding'] = df['method']
+df.sort_values(by='Dataset', inplace=True)
+
+sns_plot = sns.relplot(x="F1-Weighted", y="Dataset", hue="Classifier", s=100, style="Embedding", data=df,
+                       aspect=2, alpha=0.8)
+sns_plot.set_axis_labels('Weighted F1-Score', '')
+sns_plot.set(title="Ridle vs. other KG Embeddings")
+plt.subplots_adjust(bottom=0.1, top=0.9)
+fig = sns_plot.fig
+fig.show()
