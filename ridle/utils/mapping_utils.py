@@ -3,6 +3,8 @@ import json
 import numpy as np
 import pandas as pd
 
+from ridle import ROOT_DIR
+
 
 class SubToClassMapper:
     """
@@ -78,8 +80,8 @@ def class_list_to_numeric(classes, name_to_idx_dict, one_hot=False):
 
 
 if __name__ == '__main__':
-    mappings_path = "dataset/dbp_type_mapping.json"
-    embeddings_path = "dataset/DBp_2016-04/embedding.csv"
+    mappings_path = f"{ROOT_DIR}/dataset/dbp_type_mapping.json"
+    embeddings_path = f"{ROOT_DIR}/dataset/DBp_2016-04/embedding.csv"
     embeddings = pd.read_csv(embeddings_path)
 
     # get mapper from subjects to class names (strings)

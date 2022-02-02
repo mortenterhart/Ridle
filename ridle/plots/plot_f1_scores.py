@@ -2,11 +2,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
+from ridle import ROOT_DIR
+
 sns.set_theme(style="whitegrid")
 
-nn_scores = pd.read_csv('f1_scores/evaluation_nn.csv')[:9]
-knn_scores = pd.read_csv('f1_scores/evaluation_knn.csv')[:9]
-rf_scores = pd.read_csv('f1_scores/evaluation_rf.csv')[:9]
+nn_scores = pd.read_csv(f'{ROOT_DIR}/f1_scores/evaluation_nn.csv')[:9]
+knn_scores = pd.read_csv(f'{ROOT_DIR}/f1_scores/evaluation_knn.csv')[:9]
+rf_scores = pd.read_csv(f'{ROOT_DIR}/f1_scores/evaluation_rf.csv')[:9]
 
 nn_scores['Classifier'] = 'Neural Network'
 knn_scores['Classifier'] = 'KNN'
@@ -44,9 +46,9 @@ fig = sns_plot.fig
 fig.show()
 
 
-nn_scores = pd.read_csv('f1_scores/evaluation_nn.csv')[11:]
-knn_scores = pd.read_csv('f1_scores/evaluation_knn.csv')[11:]
-rf_scores = pd.read_csv('f1_scores/evaluation_rf.csv')[11:]
+nn_scores = pd.read_csv(f'{ROOT_DIR}/f1_scores/evaluation_nn.csv')[11:]
+knn_scores = pd.read_csv(f'{ROOT_DIR}/f1_scores/evaluation_knn.csv')[11:]
+rf_scores = pd.read_csv(f'{ROOT_DIR}/f1_scores/evaluation_rf.csv')[11:]
 
 nn_scores['Classifier'] = 'Neural Network'
 knn_scores['Classifier'] = 'KNN'

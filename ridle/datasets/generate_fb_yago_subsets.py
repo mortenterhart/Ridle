@@ -1,8 +1,9 @@
 import pandas as pd
 import os
 
-from fb_yago_subsets import fb_yago_subsets
-from dataset_class_counts import dataset_class_counts
+from ridle import ROOT_DIR
+from ridle.datasets.fb_yago_subsets import fb_yago_subsets
+from ridle.evaluation.dataset_class_counts import dataset_class_counts
 
 MIN_CLASS_MEMBERS = 40
 
@@ -16,12 +17,12 @@ def extract_dataset(df, labels):
 
 
 def main():
-    fb_triples = pd.read_pickle('dataset/FB15K237/dataset.pkl')
-    fb_types = pd.read_csv('dataset/FB15K237/freebase_types.tsv', sep='\t', names=['S', 'Class'])
+    fb_triples = pd.read_pickle(f'{ROOT_DIR}/dataset/FB15K237/dataset.pkl')
+    fb_types = pd.read_csv(f'{ROOT_DIR}/dataset/FB15K237/freebase_types.tsv', sep='\t', names=['S', 'Class'])
     fb_labelled = fb_triples.merge(fb_types, on='S', how='inner')
 
-    yago_triples = pd.read_pickle('dataset/YAGO3-10/dataset.pkl')
-    yago_types = pd.read_csv('dataset/YAGO3-10/yago_types.tsv', sep='\t', names=['S', 'P', 'Class'])
+    yago_triples = pd.read_pickle(f'{ROOT_DIR}/dataset/YAGO3-10/dataset.pkl')
+    yago_types = pd.read_csv(f'{ROOT_DIR}/dataset/YAGO3-10/yago_types.tsv', sep='\t', names=['S', 'P', 'Class'])
     yago_types = yago_types[['S', 'Class']].replace(['^<', '>$'], '', regex=True)
     yago_labelled = yago_triples.merge(yago_types, on='S', how='inner')
 
@@ -32,11 +33,11 @@ def main():
         subset = extract_dataset(dataset, include_types)
         print(f"class counts for {dataset_name}\n{dataset_class_counts(subset[['S', 'Class']].drop_duplicates())}")
 
-        if not os.path.exists(f'./dataset/{dataset_name}'):
-            os.makedirs(f'./dataset/{dataset_name}')
+        if not os.path.exists(f'{ROOT_DIR}/dataset/{dataset_name}'):
+            os.makedirs(f'{ROOT_DIR}/dataset/{dataset_name}')
 
         subset.drop(columns=['Class'], inplace=True)
-        subset.to_pickle(f'./dataset/{dataset_name}/dataset.pkl')
+        subset.to_pickle(f'{ROOT_DIR}/dataset/{dataset_name}/dataset.pkl')
         print(f'Saved dataset {dataset_name}')
 
 

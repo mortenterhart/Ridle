@@ -1,7 +1,8 @@
 import pandas as pd
 
-from type_preprocessing import aggregate_type_mappings, exclude_external_types
-from fb_yago_subsets import fb_yago_subsets
+from ridle import ROOT_DIR
+from ridle.utils.type_preprocessing import aggregate_type_mappings, exclude_external_types
+from ridle.datasets.fb_yago_subsets import fb_yago_subsets
 
 pd.set_option('display.max_rows', 100)
 
@@ -30,34 +31,32 @@ def main():
     for dataset in dataset_names:
         # Load Representations
         print('Reading Data...')
-        df = pd.read_csv('./dataset/{}/embedding.csv'.format(dataset))
+        df = pd.read_csv(f'{ROOT_DIR}/dataset/{dataset}/embedding.csv')
 
         # Load mapping
         if 'dbp' in dataset.lower():
-            mapping = pd.read_json('./dataset/dbp_type_mapping.json')
+            mapping = pd.read_json(f'{ROOT_DIR}/dataset/dbp_type_mapping.json')
         elif 'wd' in dataset.lower() or 'wikidata' in dataset.lower():
-            mapping = pd.read_json('./dataset/wd_mapping_type.json')
+            mapping = pd.read_json(f'{ROOT_DIR}/dataset/wd_mapping_type.json')
         elif 'fb' in dataset.lower():
-            fb_types = pd.read_csv('./dataset/FB15K237/freebase_types.tsv', sep='\t', names=['S', 'Class'])
+            fb_types = pd.read_csv(f'{ROOT_DIR}/dataset/FB15K237/freebase_types.tsv', sep='\t', names=['S', 'Class'])
             mapping = aggregate_type_mappings(fb_types)
 
             if dataset in fb_yago_subsets:
                 mapping = exclude_external_types(mapping, fb_yago_subsets[dataset])
         elif 'yago' in dataset.lower():
-            yago_types = pd.read_csv('./dataset/YAGO3-10/yago_types.tsv', sep='\t', names=['S', 'P', 'Class'])
+            yago_types = pd.read_csv(f'{ROOT_DIR}/dataset/YAGO3-10/yago_types.tsv', sep='\t', names=['S', 'P', 'Class'])
             yago_types = yago_types[['S', 'Class']].replace(['^<', '>$'], ['', ''], regex=True)
             mapping = aggregate_type_mappings(yago_types)
 
             if dataset in fb_yago_subsets:
                 mapping = exclude_external_types(mapping, fb_yago_subsets[dataset])
         else:
-            mapping = pd.read_json('./dataset/{}/type_mapping.json'.format(dataset))
+            mapping = pd.read_json(f'{ROOT_DIR}/dataset/{dataset}/type_mapping.json')
 
         # merge them
         r = pd.merge(df, mapping, on='S')
         r = r[['S', 'Class']]
-
-        # print(f'Classes for dataset {dataset}\n{r}')
 
         # Create one row for each class of entities
         r = r.explode('Class')

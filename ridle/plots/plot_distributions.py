@@ -3,11 +3,10 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from fb_yago_subsets import fb_yago_subsets
-from dataset_predicate_counts import get_predicate_counts_for_dataset
+from ridle.datasets.fb_yago_subsets import fb_yago_subsets
+from ridle.evaluation.dataset_predicate_counts import get_predicate_counts_for_dataset
 from sklearn.preprocessing import LabelEncoder
 import seaborn as sns
-import re
 
 
 def counts_to_list(pred_counts, label):
@@ -19,7 +18,7 @@ def counts_to_list(pred_counts, label):
 
 
 def main():
-    dataset_name = 'YAGO-L3-person-scientist'
+    dataset_name = 'YAGO-L3-person-artist'
 
     labels = fb_yago_subsets[dataset_name]
 
@@ -52,8 +51,6 @@ def main():
 
     g = sns.displot(data=predicate_distributions, x='P', kind='kde', hue='Class',
                     fill=True, bw_adjust=0.3, aspect=1.5, legend=True)
-    # plt.legend(loc='upper left', labels=[re.sub("^wordnet_|_[0-9]+", "", i) for i in reversed(labels)], title='Class',
-    #            frameon=False)
     g.set(xlabel="Predicate Id", ylabel="Predicate Frequency", title=f'Predicate Distributions for {dataset_name}')
     plt.subplots_adjust(top=0.9)
     plt.show()
