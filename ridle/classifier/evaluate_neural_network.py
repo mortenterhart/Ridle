@@ -11,8 +11,8 @@ import argparse
 import os
 
 from ridle import ROOT_DIR
-from ridle.utils.type_preprocessing import aggregate_type_mappings, exclude_external_types
-from ridle.datasets.fb_yago_subsets import fb_yago_subsets
+from ridle.utils import aggregate_type_mappings, exclude_external_types
+from ridle.datasets import fb_yago_subsets
 
 
 parser = argparse.ArgumentParser(

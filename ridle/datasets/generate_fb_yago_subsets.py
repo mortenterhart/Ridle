@@ -2,8 +2,8 @@ import pandas as pd
 import os
 
 from ridle import ROOT_DIR
-from ridle.datasets.fb_yago_subsets import fb_yago_subsets
-from ridle.evaluation.dataset_class_counts import dataset_class_counts
+from ridle.datasets import fb_yago_subsets
+from ridle.evaluation import dataset_class_counts
 
 MIN_CLASS_MEMBERS = 40
 

@@ -2,11 +2,11 @@ import os
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
-from ridle.datasets.fb_yago_subsets import fb_yago_subsets
-from ridle.evaluation.dataset_predicate_counts import get_predicate_counts_for_dataset
 from sklearn.preprocessing import LabelEncoder
 import seaborn as sns
+
+from ridle.datasets import fb_yago_subsets
+from ridle.evaluation import get_predicate_counts_for_dataset
 
 
 def counts_to_list(pred_counts, label):

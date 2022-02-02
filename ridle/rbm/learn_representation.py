@@ -7,7 +7,7 @@ from pathlib import Path
 import wget
 
 from ridle import ROOT_DIR
-from ridle.rbm.RBM import RBM
+from ridle.rbm import RBM
 
 
 # https://www.dropbox.com/sh/szvuv79ubfqgmn5/AACHxl_eC0frcGrZpVy0VDQPa?dl=0
