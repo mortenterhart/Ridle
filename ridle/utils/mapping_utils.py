@@ -10,6 +10,7 @@ class SubToClassMapper:
     """
     Maps string subject to string class.
     """
+
     def __init__(self, mappings):
         """
 
@@ -52,7 +53,7 @@ def get_classes_to_idx_dict(mapper, embeddings):
             classes = mapper.get_classes(subject)
             label_set.update(classes)
         except KeyError:
-            print(f"subject {subject} not found in the embeddings")
+            print(f'subject {subject} not found in the embeddings')
 
     class_idx_dict = {class_name: idx for idx, class_name in enumerate(label_set)}
 
@@ -79,9 +80,9 @@ def class_list_to_numeric(classes, name_to_idx_dict, one_hot=False):
     return encoding
 
 
-if __name__ == '__main__':
-    mappings_path = f"{ROOT_DIR}/dataset/dbp_type_mapping.json"
-    embeddings_path = f"{ROOT_DIR}/dataset/DBp_2016-04/embedding.csv"
+def main():
+    mappings_path = f'{ROOT_DIR}/dataset/dbp_type_mapping.json'
+    embeddings_path = f'{ROOT_DIR}/dataset/DBp_2016-04/embedding.csv'
     embeddings = pd.read_csv(embeddings_path)
 
     # get mapper from subjects to class names (strings)
@@ -94,7 +95,8 @@ if __name__ == '__main__':
     # calc multi-label and one-hot encodings
     enc = class_list_to_numeric(['Device', 'Stadium', 'RailwayLine', 'Murderer', 'HistoricBuilding'], class_to_idx_dict)
     print(enc)
-    enc = class_list_to_numeric(['Device', 'Stadium', 'RailwayLine', 'Murderer', 'HistoricBuilding'], class_to_idx_dict, one_hot=True)
+    enc = class_list_to_numeric(['Device', 'Stadium', 'RailwayLine', 'Murderer', 'HistoricBuilding'], class_to_idx_dict,
+                                one_hot=True)
     print(enc)
 
     #
@@ -105,12 +107,16 @@ if __name__ == '__main__':
     for subject in embeddings['S']:
         try:
             classes = mapper.get_classes(subject)
-            print(subject, ": ", classes)
+            print(subject, ': ', classes)
             label_set.update(classes)
         except KeyError:
             num_unmapped += 1
 
-    print(f"{len(label_set)=}, {label_set}")
+    print(f'{len(label_set)=}, {label_set}')
     class_idx_dict = {class_name: idx for idx, class_name in enumerate(label_set)}
     print(class_idx_dict)
-    print(f"{num_unmapped=}, num_mapped={len(embeddings['S']) - num_unmapped}")
+    print(f'{num_unmapped=}, num_mapped={len(embeddings["S"]) - num_unmapped}')
+
+
+if __name__ == '__main__':
+    main()

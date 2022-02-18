@@ -1,19 +1,16 @@
 import pandas as pd
 
 from ridle import ROOT_DIR
-from ridle.utils import aggregate_type_mappings, exclude_external_types
-from ridle.datasets import fb_yago_subsets
-
-pd.set_option('display.max_rows', 100)
+from ridle.types import load_type_mappings
 
 
-def dataset_class_counts(types_df):
+def dataset_class_counts(triples_df):
     """
     Returns the number of instances of each class in the dataset.
 
     Parameters
     ----------
-    types_df : pandas.DataFrame
+    triples_df : pandas.DataFrame
         The dataset to be analyzed.
 
     Returns
@@ -21,7 +18,7 @@ def dataset_class_counts(types_df):
     pandas.Series
         A series with the number of instances of each class.
     """
-    return types_df.groupby('Class').size().sort_values()
+    return triples_df.groupby('Class').size().sort_values()
 
 
 def main():
@@ -30,40 +27,22 @@ def main():
 
     for dataset in dataset_names:
         # Load Representations
-        print('Reading Data...')
+        print(f'Loading dataset {dataset}...')
         df = pd.read_csv(f'{ROOT_DIR}/dataset/{dataset}/embedding.csv')
 
-        # Load mapping
-        if 'dbp' in dataset.lower():
-            mapping = pd.read_json(f'{ROOT_DIR}/dataset/dbp_type_mapping.json')
-        elif 'wd' in dataset.lower() or 'wikidata' in dataset.lower():
-            mapping = pd.read_json(f'{ROOT_DIR}/dataset/wd_mapping_type.json')
-        elif 'fb' in dataset.lower():
-            fb_types = pd.read_csv(f'{ROOT_DIR}/dataset/FB15K237/freebase_types.tsv', sep='\t', names=['S', 'Class'])
-            mapping = aggregate_type_mappings(fb_types)
+        # Load type mappings
+        mappings = load_type_mappings(dataset)
 
-            if dataset in fb_yago_subsets:
-                mapping = exclude_external_types(mapping, fb_yago_subsets[dataset])
-        elif 'yago' in dataset.lower():
-            yago_types = pd.read_csv(f'{ROOT_DIR}/dataset/YAGO3-10/yago_types.tsv', sep='\t', names=['S', 'P', 'Class'])
-            yago_types = yago_types[['S', 'Class']].replace(['^<', '>$'], ['', ''], regex=True)
-            mapping = aggregate_type_mappings(yago_types)
-
-            if dataset in fb_yago_subsets:
-                mapping = exclude_external_types(mapping, fb_yago_subsets[dataset])
-        else:
-            mapping = pd.read_json(f'{ROOT_DIR}/dataset/{dataset}/type_mapping.json')
-
-        # merge them
-        r = pd.merge(df, mapping, on='S')
-        r = r[['S', 'Class']]
+        # Merge them
+        mapped = pd.merge(df, mappings, on='S')
+        mapped = mapped[['S', 'Class']]
 
         # Create one row for each class of entities
-        r = r.explode('Class')
+        mapped = mapped.explode('Class')
 
-        # count the classes
+        # Count the classes
         print(f'Class counts for dataset {dataset}')
-        class_counts = dataset_class_counts(r)
+        class_counts = dataset_class_counts(mapped)
         print(class_counts)
 
 

@@ -1,5 +1,6 @@
-import pandas as pd
 import os
+
+import pandas as pd
 
 from ridle import ROOT_DIR
 from ridle.datasets import fb_yago_subsets
@@ -8,12 +9,13 @@ from ridle.evaluation import dataset_class_counts
 MIN_CLASS_MEMBERS = 40
 
 
-def extract_dataset(df, labels):
+def extract_subset(df, include_types):
     class_counts = dataset_class_counts(df[['S', 'Class']].drop_duplicates())
-    labels = set(class_counts.index) & set(labels)
-    class_counts = class_counts[list(labels)]
-    include_types = class_counts[class_counts >= MIN_CLASS_MEMBERS].index
-    return pd.concat([df[df['Class'] == label] for label in include_types]).reset_index(drop=True)
+
+    include_types = [t for t in include_types if t in class_counts.index]
+    include_types = [t for t in include_types if class_counts[t] >= MIN_CLASS_MEMBERS]
+
+    return df[df['Class'].isin(include_types)].reset_index(drop=True)
 
 
 def main():
@@ -29,9 +31,12 @@ def main():
     for dataset_name, include_types in fb_yago_subsets.items():
         print(f'Extracting dataset {dataset_name}')
 
-        dataset = fb_labelled if 'fb' in dataset_name.lower() else yago_labelled
-        subset = extract_dataset(dataset, include_types)
-        print(f"class counts for {dataset_name}\n{dataset_class_counts(subset[['S', 'Class']].drop_duplicates())}")
+        if 'fb' in dataset_name.lower():
+            df = fb_labelled
+        else:
+            df = yago_labelled
+
+        subset = extract_subset(df, include_types)
 
         if not os.path.exists(f'{ROOT_DIR}/dataset/{dataset_name}'):
             os.makedirs(f'{ROOT_DIR}/dataset/{dataset_name}')

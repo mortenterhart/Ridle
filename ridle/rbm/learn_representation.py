@@ -1,14 +1,13 @@
 import argparse
 import os
+from pathlib import Path
 
 import pandas as pd
-from sklearn.preprocessing import MultiLabelBinarizer
-from pathlib import Path
 import wget
+from sklearn.preprocessing import MultiLabelBinarizer
 
 from ridle import ROOT_DIR
 from ridle.rbm import RBM
-
 
 # https://www.dropbox.com/sh/szvuv79ubfqgmn5/AACHxl_eC0frcGrZpVy0VDQPa?dl=0
 download_links = {

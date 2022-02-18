@@ -23,6 +23,6 @@ def aggregate_type_mappings(types_df):
 
 
 def exclude_external_types(types_df, include_types):
-    types_df['Class'] = types_df['Class'].apply(lambda types: [t for t in types if t in include_types])
-    return types_df
-
+    reduced_types = types_df.copy()
+    reduced_types['Class'] = reduced_types['Class'].apply(lambda types: [t for t in types if t in include_types])
+    return reduced_types
